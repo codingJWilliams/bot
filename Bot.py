@@ -7,8 +7,8 @@ def genToken(username, passwd):
             "VALIANTMC.NET[{}]".format(passwd).encode("utf-8")
             ).hexdigest().upper()
         })
-username = "[URURSERNAME]"
-token = genToken("[URURSERNAME]", "PASSWORD").json()["token"]
+username = "JayWilliams"
+token = genToken("JayWilliams", "NOCHANCEMATE").json()["token"]
 def on_message(ws, message):
     handle_message(ws, message)
 
@@ -37,7 +37,11 @@ def send_message(text):
 def getText(message):
     try: return json.loads(json.loads(message)['rawJson'])["extra"][7]["text"]
     except: return None
-
+def isMessage(message):
+    try:
+        json.loads(json.loads(message)['rawJson'])["extra"][7]["text"]
+        return True
+    except: return False
 def handle_message(ws, message):
     conn = isConnected(message)
     welcomePresets = {
@@ -49,7 +53,7 @@ def handle_message(ws, message):
         "TycerX": "Hey Tycer, I'm a bot!!",
         "Firework": "Hi _Firework",
         "AwesomeL2": "Hi L2!!!"}
-    if conn != False:
+    if False:    # Disabled on admin's request
         try: msg = welcomePresets[conn]
         except: msg = " Welcome back, {un}".format(un = conn)
         time.sleep(0.5)
@@ -57,7 +61,15 @@ def handle_message(ws, message):
     fr = isFriendRequest(message)
     if fr != False:
         send_message(fr)
-        
+    if isMessage(message):
+        if "blame upper" in getText(message).lower():
+            with open("upper.json", "r") as f:
+                uppercount = json.loads(f.read())['count']
+            uppercount += 1
+            with open("upper.json", "w") as f:
+                f.write(json.dumps({"count": uppercount}))
+            if uppercount % 10 == 0:
+                send_message(" ☾-- Upper has now been blamed {times} times --☽".format(times = uppercount))
 def on_open(ws):
     ws.send(json.dumps({"type": "auth","username": username,"token": token}))
     def run(*args):
